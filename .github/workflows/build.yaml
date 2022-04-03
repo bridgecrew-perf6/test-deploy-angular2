@@ -21,7 +21,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Deploy to Server
         run: |
-          echo ${{ env.SERVER_SSH_KEY }}
+          echo "${{ env.SERVER_SSH_KEY }}"
         env:
           SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
 
