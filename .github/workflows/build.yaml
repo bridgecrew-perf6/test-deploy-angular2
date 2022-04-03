@@ -31,9 +31,9 @@ jobs:
           CI: false
       - name: Deploy to Server
         run: |
-          echo "$SERVER_SSH_KEY"
+          echo ${{ secrets.SERVER_SSH_KEY }}
         env:
-          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY}}
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
 
 
 
