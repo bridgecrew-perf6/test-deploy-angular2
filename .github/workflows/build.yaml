@@ -30,7 +30,6 @@ jobs:
         env:
           CI: false
       - name: Deploy to Server
-        uses: easingthemes/ssh-deploy@main
         run: |
           echo "$SERVER_SSH_KEY"
 
