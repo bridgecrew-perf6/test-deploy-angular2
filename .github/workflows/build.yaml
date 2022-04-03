@@ -31,12 +31,8 @@ jobs:
           CI: false
       - name: Deploy to Server
         uses: easingthemes/ssh-deploy@main
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-          ARGS: "-rltgoDzvO --delete"
-          SOURCE: "dist/"
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          EXCLUDE: "/dist/, /node_modules/"
+        run: |
+          echo "$SERVER_SSH_KEY"
+
 
 
