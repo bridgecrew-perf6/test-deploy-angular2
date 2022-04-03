@@ -1,42 +1,40 @@
-name: CI/CD deploy angular
+name: Build Develop Branch
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  #First we will see the application build or not , then we will deploy in EC2
   build:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        node-version: [ 14.x ]
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Build the docker_compose
-        run: docker-compose up -d --build
-
-      - name: Buid the application
-        run: docker-compose exec -T counter_app npm run build
-
-  Deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Deploy in EC2
+      - name: Code Checkout
+        uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install npm dependencies
+        run: npm install
+      - name: install ng
+        run: npm install -g @angular/cli@latest
+      - name: Create Build
+        run: ng build --prod
         env:
-          PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
-          HOSTNAME : ${{ secrets.HOSTNAME  }}
-          USER_NAME : ${{ secrets.USER_NAME  }}
+          CI: false
+      - name: Deploy to Server
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          ARGS: "-rltgoDzvO --delete"
+          SOURCE: "dist/"
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          EXCLUDE: "/dist/, /node_modules/"
 
-        run: |
-          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
 
-            #Now we have got the access of EC2 and we will start the deploy .
-            cd /home/ubuntu/CounterApp &&
-            git checkout master &&
-            git fetch --all &&
-            git reset --hard origin/master &&
-            git pull origin master &&
-            docker-compose -f docker-compose.prod.yml up -d --build
