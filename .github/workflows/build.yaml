@@ -32,6 +32,8 @@ jobs:
       - name: Deploy to Server
         run: |
           echo "$SERVER_SSH_KEY"
+        env:
+          SERVER_SSH_KEY: 123
 
 
 
