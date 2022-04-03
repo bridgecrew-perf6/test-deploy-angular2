@@ -23,6 +23,8 @@ jobs:
         run: npm install
       - name: install ng
         run: npm install -g @angular/cli@latest
+      - name: Pull code master
+        run: git pull
       - name: Create Build
         run: ng build --prod
         env:
